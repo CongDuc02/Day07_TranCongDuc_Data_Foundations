@@ -180,6 +180,8 @@ PY
 
 ## Nhiệm Vụ Nhóm (Giai Đoạn 2) — So Sánh Chiến Lược
 
+> Trước khi thu thập dữ liệu, đọc [Hướng dẫn crawl và format dữ liệu](docs/DATA_COLLECTION.md). Mỗi nhóm crawl theo **chủ đề tự chọn**, dùng 5–10 nguồn công khai/được phép và lưu kèm metadata có thể truy vết.
+
 1. **Chọn bộ tài liệu** (5-10 tài liệu): FAQ, Quy trình chuẩn (SOP), chính sách, tài liệu nội bộ, hoặc bất kỳ chủ đề nào
 2. **Chuyển sang định dạng .txt/.md** nếu cần (xem mẹo trong exercises.md)
 3. **Thống nhất 5 câu hỏi đánh giá** kèm theo câu trả lời chuẩn (gold answers)

@@ -59,6 +59,8 @@ Chạy `pytest tests/` để kiểm tra tiến độ.
 
 Mỗi nhóm chọn một chủ đề (domain) và chuẩn bị bộ tài liệu:
 
+> Đọc trước [Hướng dẫn crawl và format dữ liệu](docs/DATA_COLLECTION.md). Tài liệu này quy định nguồn được dùng, quy trình crawl an toàn, cấu trúc thư mục, metadata và `sources.csv`.
+
 **Bước 1 — Chọn chủ đề:** FAQ (Câu hỏi thường gặp), SOP (Quy trình chuẩn), chính sách, tài liệu kỹ thuật, công thức nấu ăn, luật, y tế, v.v.
 
 **Bước 2 — Thu thập 5-10 tài liệu.** Chỉ dùng nguồn công khai hoặc nguồn nhóm có quyền sử dụng; lưu dưới dạng `.txt` hoặc `.md` vào thư mục `data/`.
