@@ -20,6 +20,17 @@ Mỗi nhóm **tự chọn một chủ đề** cho Giai đoạn 2 và thu thập 
 
 > Không bắt buộc nộp scraper. Chỉ nộp script nếu không làm lộ API key hay dữ liệu không được phép chia sẻ.
 
+### Dùng crawler mẫu (tùy chọn)
+
+Repo có sẵn `scripts/fetch_public_pages.py`. Sao chép `scripts/urls.example.csv`, điền các URL được phép dùng, rồi chạy:
+
+```bash
+cp scripts/urls.example.csv data/urls.csv
+python3 scripts/fetch_public_pages.py data/urls.csv --output-dir data/<ten-chu-de>
+```
+
+Script chỉ lấy trang HTML/text công khai, kiểm tra `robots.txt`, chờ tối thiểu 1 giây giữa các request và tạo file `.md` cùng `sources.csv`. Không dùng nó cho nội dung cần đăng nhập, CAPTCHA, trang JavaScript động hoặc PDF; khi đó hãy chọn nguồn khác hay chuyển/clean thủ công.
+
 ## 3. Cấu trúc thư mục
 
 ```text
