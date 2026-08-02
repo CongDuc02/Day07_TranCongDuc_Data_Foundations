@@ -6,6 +6,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from ingest import build_knowledge_base
 from src.agent import KnowledgeBaseAgent
 from src.embeddings import (
     EMBEDDING_PROVIDER_ENV,
@@ -15,113 +16,78 @@ from src.embeddings import (
     OpenAIEmbedder,
     _mock_embed,
 )
-from src.models import Document
-from src.store import EmbeddingStore
 
-SAMPLE_FILES = [
-    "data/python_intro.txt",
-    "data/vector_store_notes.md",
-    "data/rag_system_design.md",
-    "data/customer_support_playbook.txt",
-    "data/chunking_experiment_report.md",
-    "data/vi_retrieval_notes.md",
-]
+# Thư mục dữ liệu mặc định cho demo = bộ khởi động cố định của lớp K3.
+# Đổi bằng biến môi trường: LAB_DATA_DIR=data/<thu-muc-cua-nhom> python3 main.py
+DEFAULT_DATA_DIR = "data/k3_university"
 
 
-def load_documents_from_files(file_paths: list[str]) -> list[Document]:
-    """Load documents from file paths for the manual demo."""
-    allowed_extensions = {".md", ".txt"}
-    documents: list[Document] = []
-
-    for raw_path in file_paths:
-        path = Path(raw_path)
-
-        if path.suffix.lower() not in allowed_extensions:
-            print(f"Skipping unsupported file type: {path} (allowed: .md, .txt)")
-            continue
-
-        if not path.exists() or not path.is_file():
-            print(f"Skipping missing file: {path}")
-            continue
-
-        content = path.read_text(encoding="utf-8")
-        documents.append(
-            Document(
-                id=path.stem,
-                content=content,
-                metadata={"source": str(path), "extension": path.suffix.lower()},
-            )
-        )
-
-    return documents
-
-
-def demo_llm(prompt: str) -> str:
-    """A simple mock LLM for manual RAG testing."""
-    preview = prompt[:400].replace("\n", " ")
-    return f"[DEMO LLM] Generated answer from prompt preview: {preview}..."
-
-
-def run_manual_demo(question: str | None = None, sample_files: list[str] | None = None) -> int:
-    files = sample_files or SAMPLE_FILES
-    query = question or "Summarize the key information from the loaded files."
-
-    print("=== Manual File Test ===")
-    print("Accepted file types: .md, .txt")
-    print("Input file list:")
-    for file_path in files:
-        print(f"  - {file_path}")
-
-    docs = load_documents_from_files(files)
-    if not docs:
-        print("\nNo valid input files were loaded.")
-        print("Create files matching the sample paths above, then rerun:")
-        print("  python3 main.py")
-        return 1
-
-    print(f"\nLoaded {len(docs)} documents")
-    for doc in docs:
-        print(f"  - {doc.id}: {doc.metadata['source']}")
-
+def _select_embedder():
+    """Chọn backend nhúng theo biến môi trường EMBEDDING_PROVIDER (mock | local | openai)."""
     load_dotenv(override=False)
     provider = os.getenv(EMBEDDING_PROVIDER_ENV, "mock").strip().lower()
     if provider == "local":
         try:
-            embedder = LocalEmbedder(model_name=os.getenv("LOCAL_EMBEDDING_MODEL", LOCAL_EMBEDDING_MODEL))
+            return LocalEmbedder(model_name=os.getenv("LOCAL_EMBEDDING_MODEL", LOCAL_EMBEDDING_MODEL))
         except Exception:
-            embedder = _mock_embed
-    elif provider == "openai":
+            print("Local embedder không sẵn sàng; tạm dùng mock.")
+            return _mock_embed
+    if provider == "openai":
         try:
-            embedder = OpenAIEmbedder(model_name=os.getenv("OPENAI_EMBEDDING_MODEL", OPENAI_EMBEDDING_MODEL))
+            return OpenAIEmbedder(model_name=os.getenv("OPENAI_EMBEDDING_MODEL", OPENAI_EMBEDDING_MODEL))
         except Exception:
-            embedder = _mock_embed
-    else:
-        embedder = _mock_embed
+            print("OpenAI embedder không sẵn sàng; tạm dùng mock.")
+            return _mock_embed
+    return _mock_embed
 
-    print(f"\nEmbedding backend: {getattr(embedder, '_backend_name', embedder.__class__.__name__)}")
 
-    store = EmbeddingStore(collection_name="manual_test_store", embedding_fn=embedder)
-    store.add_documents(docs)
+def demo_llm(prompt: str) -> str:
+    """LLM giả lập đơn giản để thử RAG thủ công."""
+    preview = prompt[:400].replace("\n", " ")
+    return f"[DEMO LLM] Generated answer from prompt preview: {preview}..."
 
-    print(f"\nStored {store.get_collection_size()} documents in EmbeddingStore")
-    print("\n=== EmbeddingStore Search Test ===")
-    print(f"Query: {query}")
-    search_results = store.search(query, top_k=3)
-    for index, result in enumerate(search_results, start=1):
+
+def run_manual_demo(question: str | None = None, data_dir: str | None = None) -> int:
+    data_dir = data_dir or DEFAULT_DATA_DIR
+    query = question or "Tóm tắt thông tin chính từ bộ tài liệu."
+
+    print("=== Demo pipeline nạp dữ liệu (ingest.build_knowledge_base) ===")
+    print(f"Thư mục dữ liệu: {data_dir}")
+    if not Path(data_dir).exists():
+        print(f"Không tìm thấy thư mục dữ liệu: {data_dir}")
+        print("Thu thập tài liệu vào thư mục này (xem docs/DATA_COLLECTION.md) rồi chạy lại:")
+        print("  python3 main.py")
+        return 1
+
+    embedder = _select_embedder()
+    backend = getattr(embedder, "_backend_name", embedder.__class__.__name__)
+    print(f"Backend nhúng: {backend}")
+    if backend == "mock embeddings fallback":
+        print(
+            "Lưu ý: mock chỉ để chạy thử/unit test và KHÔNG phản ánh chất lượng ngữ nghĩa. "
+            "Ở Giai đoạn 2, đặt EMBEDDING_PROVIDER=local để so sánh retrieval có ý nghĩa."
+        )
+
+    # Pipeline cung cấp sẵn: parse front matter -> chunk -> gắn metadata -> nạp store.
+    store = build_knowledge_base(data_dir, embedding_fn=embedder)
+    print(f"Đã nạp {store.get_collection_size()} chunk vào EmbeddingStore")
+
+    print("\n=== Tìm kiếm (EmbeddingStore.search) ===")
+    print(f"Câu hỏi: {query}")
+    for index, result in enumerate(store.search(query, top_k=3), start=1):
         print(f"{index}. score={result['score']:.3f} source={result['metadata'].get('source')}")
-        print(f"   content preview: {result['content'][:120].replace(chr(10), ' ')}...")
+        print(f"   {result['content'][:120].replace(chr(10), ' ')}...")
 
-    print("\n=== KnowledgeBaseAgent Test ===")
+    print("\n=== KnowledgeBaseAgent ===")
     agent = KnowledgeBaseAgent(store=store, llm_fn=demo_llm)
-    print(f"Question: {query}")
-    print("Agent answer:")
     print(agent.answer(query, top_k=3))
     return 0
 
 
 def main() -> int:
-    question = " ".join(sys.argv[1:]).strip() if len(sys.argv) > 1 else None
-    return run_manual_demo(question=question)
+    question = " ".join(sys.argv[1:]).strip() or None
+    data_dir = os.getenv("LAB_DATA_DIR", DEFAULT_DATA_DIR)
+    return run_manual_demo(question=question, data_dir=data_dir)
 
 
 if __name__ == "__main__":

@@ -13,7 +13,7 @@ Không yêu cầu toán học — hãy giải thích về mặt khái niệm:
 - Đưa ra một ví dụ cụ thể về hai câu sẽ có độ tương tự CAO và hai câu sẽ có độ tương tự THẤP.
 - Tại sao độ tương tự cosine lại được ưu tiên hơn khoảng cách Euclid (Euclidean distance) đối với text embeddings?
 
-> **Ghi kết quả vào:** Báo cáo — Phần 1 (Khởi động)
+> **Ghi kết quả vào:** REPORT_CANHAN.md — Phần 1 (Khởi động)
 
 ---
 
@@ -23,7 +23,7 @@ Không yêu cầu toán học — hãy giải thích về mặt khái niệm:
 - Công thức: `số lượng chunk = làm_tròn_lên((độ_dài_tài_liệu - độ_chồng_chéo) / (kích_thước_chunk - độ_chồng_chéo))`
 - Nếu độ chồng chéo (overlap) tăng lên 100, số lượng chunk sẽ thay đổi như thế nào? Tại sao bạn lại muốn tăng độ chồng chéo?
 
-> **Ghi kết quả vào:** Báo cáo — Phần 1 (Khởi động)
+> **Ghi kết quả vào:** REPORT_CANHAN.md — Phần 1 (Khởi động)
 
 ---
 
@@ -49,7 +49,7 @@ Chạy `pytest tests/` để kiểm tra tiến độ.
 - [ ] `KnowledgeBaseAgent.answer` — truy xuất (retrieve) + tạo prompt + gọi LLM
 
 > **Nộp code:** thư mục `src/`
-> **Ghi lại hướng tiếp cận vào:** Báo cáo — Phần 4 (Hướng tiếp cận của tôi)
+> **Ghi lại hướng tiếp cận vào:** REPORT_CANHAN.md — Phần 2 (Hướng tiếp cận của tôi)
 
 ---
 
@@ -57,11 +57,13 @@ Chạy `pytest tests/` để kiểm tra tiến độ.
 
 ### Bài tập 3.0 — Chuẩn Bị Tài Liệu (Giờ đầu tiên)
 
-Mỗi nhóm chọn một chủ đề (domain) và chuẩn bị bộ tài liệu:
+Chủ đề Giai đoạn 2 **cố định theo lớp K3**: dịch vụ / quy định đại học (đăng ký môn, học phí, học bổng, thư viện, ký túc xá). Nhóm chuẩn bị bộ tài liệu trong phạm vi này:
 
 > Đọc trước [Hướng dẫn crawl và format dữ liệu](docs/DATA_COLLECTION.md). Tài liệu này quy định nguồn được dùng, quy trình crawl an toàn, cấu trúc thư mục, metadata và `sources.csv`.
+>
+> **Nạp dữ liệu (đã cung cấp sẵn):** dùng `build_knowledge_base(data_dir, embedding_fn, chunker=...)` trong `ingest.py` — nó parse YAML front matter → chia chunk bằng chunker bạn chọn → gắn `doc_id` + metadata lên **từng** chunk → nạp vào `EmbeddingStore`. Bạn không phải tự viết lại pipeline này; chỉ cần tạo file `.md` đúng định dạng và chọn chunker.
 
-**Bước 1 — Chọn chủ đề:** FAQ (Câu hỏi thường gặp), SOP (Quy trình chuẩn), chính sách, tài liệu kỹ thuật, công thức nấu ăn, luật, y tế, v.v.
+**Bước 1 — Khoanh phạm vi cụ thể trong chủ đề cố định của lớp K3** (dịch vụ / quy định đại học): ví dụ quy định đăng ký học phần, hướng dẫn thư viện, chính sách học bổng, quy định ký túc xá, quy trình đóng học phí.
 
 **Bước 2 — Thu thập 5-10 tài liệu.** Chỉ dùng nguồn công khai hoặc nguồn nhóm có quyền sử dụng; lưu dưới dạng `.txt` hoặc `.md` vào thư mục `data/`.
 
@@ -87,7 +89,7 @@ Ghi vào bảng:
 
 **Bước 3 — Thiết kế cấu trúc metadata (metadata schema):** Mỗi tài liệu cần `source_url`, `retrieved_at`, `document_version` và ít nhất 2 trường hữu ích cho việc truy xuất (ví dụ: `audience`, `department`, `category`, `language`, `difficulty`).
 
-> **Ghi kết quả vào:** Báo cáo — Phần 2 (Lựa chọn tài liệu)
+> **Ghi kết quả vào:** REPORT_NHOM.md — Phần 1 (Lựa chọn tài liệu)
 
 ---
 
@@ -96,6 +98,8 @@ Ghi vào bảng:
 Mỗi thành viên **tự chọn chiến lược riêng** để thử nghiệm trên cùng bộ tài liệu của nhóm.
 
 **Bước 1 — Đường cơ sở (Baseline):** Chạy `ChunkingStrategyComparator().compare()` trên 2-3 tài liệu. Ghi lại kết quả.
+
+> **Dùng embedder thật để so sánh có ý nghĩa:** đặt `EMBEDDING_PROVIDER=local` (xem README, mục *Tùy Chọn Mô Hình Nhúng*). Trình nhúng giả lập (mock) chỉ dùng cho unit test và cho điểm gần như ngẫu nhiên — **không** phản ánh chất lượng ngữ nghĩa tiếng Việt nên đừng dùng mock để kết luận chiến lược nào tốt hơn.
 
 **Bước 2 — Chọn hoặc thiết kế chiến lược của bạn:**
 - Dùng 1 trong 3 chiến lược có sẵn (built-in strategies) với tham số tối ưu, HOẶC
@@ -116,7 +120,7 @@ class CustomChunker:
 
 **Bước 3 — So sánh:** So sánh chiến lược tùy chỉnh/được tinh chỉnh (custom/tuned strategy) với đường cơ sở (baseline) trên cùng tài liệu.
 
-> **Ghi kết quả vào:** Báo cáo — Phần 3 (Chiến lược chia nhỏ - Chunking Strategy)
+> **Ghi kết quả vào:** REPORT_NHOM.md — Phần 2 (Thiết kế chiến lược)
 
 ---
 
@@ -137,7 +141,7 @@ Mỗi nhóm viết **đúng 5 câu hỏi đánh giá** kèm theo **câu trả l�
 - Câu trả lời chuẩn phải cụ thể và có thể kiểm chứng (verify) từ tài liệu
 - Ít nhất 1 câu hỏi yêu cầu lọc bằng metadata (metadata filtering) để trả lời tốt
 
-> **Ghi kết quả vào:** Báo cáo — Phần 6 (Kết quả — Câu hỏi đánh giá & Câu trả lời chuẩn)
+> **Ghi kết quả vào:** REPORT_NHOM.md — Phần 3 (Câu hỏi đánh giá & Chất lượng truy xuất)
 
 ---
 
@@ -145,7 +149,7 @@ Mỗi nhóm viết **đúng 5 câu hỏi đánh giá** kèm theo **câu trả l�
 
 Gọi hàm `compute_similarity()` trên 5 cặp câu. **Trước khi chạy**, hãy dự đoán xem cặp câu nào sẽ có độ tương tự cao nhất/thấp nhất. Ghi lại các dự đoán của bạn và kết quả thực tế. Suy ngẫm xem điều gì khiến bạn ngạc nhiên nhất.
 
-> **Ghi kết quả vào:** Báo cáo — Phần 5 (Dự đoán độ tương tự)
+> **Ghi kết quả vào:** REPORT_CANHAN.md — Phần 4 (Dự đoán độ tương tự)
 
 ---
 
@@ -160,7 +164,7 @@ Gọi hàm `compute_similarity()` trên 5 cặp câu. **Trước khi chạy**, h
 
 **Bước 3:** Thảo luận và rút ra bài học — chuẩn bị cho phần demo (thuyết trình) với các nhóm khác.
 
-> **Ghi kết quả vào:** Báo cáo — Phần 6 (Kết quả)
+> **Ghi kết quả vào:** REPORT_CANHAN.md — Phần 5 (Kết quả truy xuất của tôi) + REPORT_NHOM.md — Phần 3 (Chất lượng truy xuất của nhóm)
 > **Gợi ý đánh giá:** xem danh sách kiểm tra ngắn trong `README.md` mục **Cách Tự Đánh Giá Kết Quả Retrieval** hoặc chi tiết hơn trong file `docs/EVALUATION.md`.
 
 ---
@@ -172,7 +176,7 @@ Tìm ít nhất **1 trường hợp lỗi (failure case)** trong quá trình so 
 - Tại sao? (do chunk quá nhỏ/quá lớn, thiếu metadata, câu hỏi mơ hồ, v.v.)
 - Đề xuất cải thiện?
 
-> **Ghi kết quả vào:** Báo cáo — Phần 7 (Những gì tôi học được)
+> **Ghi kết quả vào:** REPORT_NHOM.md — Phần 4 (Demo & Bài học nhóm)
 > **Gợi ý:** phân tích lỗi nên tham chiếu từ các góc nhìn như độ chính xác (precision), tính mạch lạc của chunk (chunk coherence), tính hữu dụng của metadata, và chất lượng thông tin nền (grounding quality).
 
 ---

@@ -1,6 +1,6 @@
 # K3 — Ngày 7: Nền Tảng Dữ Liệu, Embedding & Vector Store
 
-> Bản K3 của Lab 07. Hướng dẫn Codelabs để tải lên nằm tại `../codelabs/day7-lab-data-foundations.md`; yêu cầu Giai đoạn 2 riêng xem [K3_VARIANT.md](K3_VARIANT.md).
+> Bản K3 của Lab 07. Hướng dẫn Codelabs được phát riêng trên lớp/LMS (không kèm trong repo); yêu cầu Giai đoạn 2 riêng xem [K3_VARIANT.md](K3_VARIANT.md).
 
 ---
 
@@ -40,6 +40,8 @@ pytest tests/ -v          # Phần lớn bài kiểm thử sẽ THẤT BẠI (ch
 
 Mặc định, lab vẫn chạy với trình nhúng giả lập `_mock_embed` nên **không bắt buộc** cài đặt mô hình nhúng (embedder) thật.
 File `.env` được tự động nạp khi chạy `main.py`. Với các đoạn mã Python (snippet) chạy trực tiếp, hãy dùng lệnh `export` cho các biến môi trường cần thiết hoặc gọi hàm `load_dotenv()` nếu cần.
+
+> **Giai đoạn 2 (so sánh retrieval): đặt `EMBEDDING_PROVIDER=local`** để dùng trình nhúng đa ngữ (mô tả bên dưới). Mock sinh vector xác định nhưng **gần như ngẫu nhiên theo cả chuỗi** — chỉ hợp để chạy unit test, **không phản ánh chất lượng ngữ nghĩa** và không nên dùng để kết luận chiến lược chunking/tiếng Việt nào tốt hơn.
 
 ## Tùy Chọn Mô Hình Nhúng (Embedding Backend)
 
@@ -130,6 +132,7 @@ PY
 ├── README.md              ← Bạn đang đọc file này
 ├── exercises.md           ← Bài tập (4 phần)
 ├── main.py               ← Điểm bắt đầu cho việc chạy thử thủ công (manual demo)
+├── ingest.py             ← Pipeline nạp dữ liệu ĐÃ CUNG CẤP (front matter → chunk → metadata → store)
 ├── src/
 │   ├── chunking.py       ← Các lớp Chunking + hàm hỗ trợ tính độ tương tự
 │   ├── store.py          ← Lớp EmbeddingStore
@@ -137,13 +140,13 @@ PY
 │   └── ...               ← Các module nhỏ hơn
 ├── data/                  ← Tài liệu mẫu + tài liệu do nhóm thu thập (.txt/.md)
 ├── tests/
-│   └── test_solution.py   ← Bộ kiểm thử (Hơn 30 tests)
+│   └── test_solution.py   ← Bộ kiểm thử (42 tests)
 ├── report/
 │   ├── REPORT_NHOM.md    ← Báo cáo nhóm (1 file/nhóm)
 │   └── REPORT_CANHAN.md  ← Báo cáo cá nhân (1 file/sinh viên)
 ├── docs/
+│   ├── DATA_COLLECTION.md ← Hướng dẫn thu thập & format dữ liệu
 │   ├── EVALUATION.md     ← Các tiêu chí đánh giá
-│   ├── INSTRUCTOR_GUIDE.md ← Ghi chú dành cho giảng viên
 │   └── SCORING.md        ← Tiêu chí chấm điểm
 └── requirements.txt
 ```
@@ -154,7 +157,7 @@ PY
 
 | Giai Đoạn | Hoạt Động |
 |-----------|-----------|
-| Chuẩn bị tài liệu | Nhóm chọn chủ đề, thu thập tài liệu, chuyển sang định dạng .md/.txt |
+| Chuẩn bị tài liệu | Nhóm thu thập tài liệu theo **chủ đề cố định của lớp K3** (dịch vụ/quy định đại học), chuyển sang định dạng .md/.txt |
 | Lập trình cá nhân | Khởi động + hoàn thành tất cả TODO (cá nhân) |
 | Thiết kế chiến lược | Mỗi người thử chiến lược riêng, thống nhất 5 câu hỏi đánh giá |
 | So sánh trong nhóm | Chạy đánh giá (benchmark), so sánh kết quả, chuẩn bị thuyết trình |
@@ -180,10 +183,10 @@ PY
 
 ## Nhiệm Vụ Nhóm (Giai Đoạn 2) — So Sánh Chiến Lược
 
-> Trước khi thu thập dữ liệu, đọc [Hướng dẫn crawl và format dữ liệu](docs/DATA_COLLECTION.md). Mỗi nhóm crawl theo **chủ đề tự chọn**, dùng 5–10 nguồn công khai/được phép và lưu kèm metadata có thể truy vết.
+> Trước khi thu thập dữ liệu, đọc [Hướng dẫn crawl và format dữ liệu](docs/DATA_COLLECTION.md). Mỗi nhóm crawl theo **chủ đề cố định của lớp K3** (dịch vụ/quy định đại học — xem [K3_VARIANT.md](K3_VARIANT.md)), dùng 5–10 nguồn công khai/được phép và lưu kèm metadata có thể truy vết.
 
-1. **Chọn bộ tài liệu** (5-10 tài liệu): FAQ, Quy trình chuẩn (SOP), chính sách, tài liệu nội bộ, hoặc bất kỳ chủ đề nào
-2. **Chuyển sang định dạng .txt/.md** nếu cần (xem mẹo trong exercises.md)
+1. **Thu thập bộ tài liệu** (5-10 tài liệu) trong chủ đề cố định của lớp K3: quy định/chính sách/FAQ/hướng dẫn về đăng ký môn, học phí, học bổng, thư viện, ký túc xá
+2. **Chuyển sang định dạng .txt/.md** nếu cần (xem mẹo trong exercises.md); nạp bằng `build_knowledge_base()` trong `ingest.py`
 3. **Thống nhất 5 câu hỏi đánh giá** kèm theo câu trả lời chuẩn (gold answers)
 4. **Mỗi thành viên thử chiến lược riêng**: phương pháp chunking, các tham số, cấu trúc metadata
 5. **So sánh kết quả trong nhóm**: chiến lược nào cho việc truy xuất tốt hơn? Tại sao?

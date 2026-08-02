@@ -10,4 +10,6 @@ K3 dùng chung cam kết mã nguồn cốt lõi (core coding contract) với K4,
 - Ít nhất một thành viên thử chia nhỏ (chunking) theo tiêu đề/mục (heading/section) của sổ tay hoặc quy định học vụ.
 - Câu trả lời chuẩn (Gold answer) phải trích được từ tài liệu nhóm thu thập, không suy đoán quy định của trường.
 
-Thư mục `data/k3_university/` có dữ liệu khởi động nhỏ; nhóm vẫn cần bổ sung tập tài liệu (corpus) 5–10 tài liệu theo yêu cầu Lab.
+Thư mục `data/k3_university/` có dữ liệu khởi động nhỏ (kèm `sources.csv` mẫu — thay bằng nguồn thật); nhóm vẫn cần bổ sung tập tài liệu (corpus) 5–10 tài liệu theo yêu cầu Lab.
+
+Nạp dữ liệu bằng `build_knowledge_base()` trong `ingest.py` (parse YAML front matter → chunk → gắn `doc_id`+metadata → nạp store). Ở Giai đoạn 2 đặt `EMBEDDING_PROVIDER=local` để so sánh retrieval có ý nghĩa (mock chỉ dùng cho unit test).

@@ -1,10 +1,10 @@
 # Hướng Dẫn Thu Thập (Crawl) và Chuẩn Hóa Dữ Liệu
 
-Mỗi nhóm **tự chọn một chủ đề** cho Giai đoạn 2 và thu thập dữ liệu theo đúng chủ đề đó. Mục tiêu là có một bộ tài liệu nhỏ, đáng tin cậy để so sánh retrieval — không phải crawl càng nhiều càng tốt.
+Chủ đề Giai đoạn 2 **cố định theo lớp** (K3: dịch vụ / quy định đại học — xem `K3_VARIANT.md`). Nhóm thu thập dữ liệu **trong phạm vi chủ đề của lớp**. Mục tiêu là có một bộ tài liệu nhỏ, đáng tin cậy để so sánh retrieval — không phải crawl càng nhiều càng tốt.
 
 ## 1. Phạm vi dữ liệu cần nộp
 
-- Chọn một chủ đề rõ ràng (ví dụ: quy định đăng ký học phần, hướng dẫn thư viện, chính sách đổi trả).
+- Bám chủ đề cố định của lớp và khoanh phạm vi rõ ràng (ví dụ K3: quy định đăng ký học phần, hướng dẫn thư viện, chính sách học bổng).
 - Thu thập **5–10 tài liệu công khai** liên quan trực tiếp đến chủ đề; ưu tiên nguồn chính thức, có cấu trúc và ngày cập nhật.
 - Mỗi tài liệu là một file `.md` hoặc `.txt` trong `data/<ten-chu-de>/`; ghi nguồn trong `data/<ten-chu-de>/sources.csv`.
 - Không dùng dữ liệu cá nhân, thông tin đăng nhập, tài liệu nội bộ/không được phép chia sẻ, nội dung sau đăng nhập, hoặc nội dung có quyền sử dụng không rõ ràng.
@@ -71,6 +71,8 @@ cần thiết để trả lời benchmark query.
 - `retrieved_at` dùng định dạng `YYYY-MM-DD`; `document_version` là phiên bản/ngày hiệu lực, hoặc `not-stated`.
 - Ngoài `audience`, thêm ít nhất một trường hữu ích cho lọc như `department`, `category`, `language`, `semester`.
 - Khi nạp vào `Document`, parse front matter vào `metadata` và chỉ dùng phần bên dưới làm `content`.
+
+> **Đã cung cấp sẵn:** `build_knowledge_base()` trong `ingest.py` tự làm các bước này — parse front matter → `metadata`, chia chunk, gắn `doc_id` + metadata lên từng chunk, rồi nạp vào `EmbeddingStore`. Bạn chỉ cần tạo file `.md` đúng định dạng ở trên và chọn chunker.
 
 ## 5. File kiểm kê `sources.csv`
 
