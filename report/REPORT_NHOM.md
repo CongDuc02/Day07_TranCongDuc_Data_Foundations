@@ -12,12 +12,12 @@
 
 ## 1. Lựa chọn tài liệu (Document Set Quality) — Nhóm (10 điểm)
 
-### Chủ đề (Domain) & Lý Do Chọn
+### Phạm vi bộ tài liệu (Scope)
 
-**Chủ đề:** [ví dụ: Customer support FAQ, Luật Việt Nam, công thức nấu ăn, ...]
+**Chủ đề (cố định theo lớp K3):** Dịch vụ / quy định đại học (đăng ký môn, học phí, học bổng, thư viện, ký túc xá…).
 
-**Tại sao nhóm chọn chủ đề này?**
-> *Viết 2-3 câu:*
+**Phạm vi cụ thể nhóm tập trung:**
+> *1 câu — ví dụ: thư viện + đăng ký môn học.*
 
 ### Danh sách tài liệu (Data Inventory)
 
