@@ -1,28 +1,3 @@
-"""
-ingest.py — pipeline nạp dữ liệu ĐÃ CUNG CẤP cho Lab 7 (Giai đoạn 2/3).
-
-Biến một thư mục file `.md`/`.txt` thành một `EmbeddingStore` tìm kiếm được:
-
-    1. Parse YAML front matter  -> metadata cho từng tài liệu (xem docs/DATA_COLLECTION.md)
-    2. Chia mỗi tài liệu thành chunks bằng chiến lược bạn chọn
-    3. Gắn `doc_id` + toàn bộ metadata của tài liệu lên TỪNG chunk
-    4. Nạp tất cả chunk vào EmbeddingStore
-
-Phần "glue" này được cung cấp sẵn để bạn tập trung vào phần được chấm điểm:
-thiết kế/lựa chọn chiến lược chunking, schema metadata, câu hỏi đánh giá và phân
-tích truy xuất. Bạn vẫn truyền vào CHUNKER của mình (và có thể thêm metadata).
-
-Front matter (dạng phẳng `key: value`), ví dụ:
-
-    ---
-    doc_id: library-renewal-policy
-    audience: student
-    ---
-    <nội dung đã làm sạch>
-
-Chạy `python3 ingest.py` để tự kiểm tra bộ parser front matter (không cần store —
-chạy được cả trước khi bạn hoàn thành Giai đoạn 2).
-"""
 """Ingest pipeline for the K3 (hocvu-hust) RAG lab.
 
 Provides:
